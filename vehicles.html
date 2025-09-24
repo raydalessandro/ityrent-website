@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veicoli Disponibili - ityrent.it</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #0a0a0a;
+            color: white;
+        }
+
+        /* Header (stesso della landing) */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            background: white;
+            color: black;
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        .logo-text {
+            color: white;
+            font-size: 28px;
+            font-weight: 300;
+        }
+
+        .logo-tagline {
+            color: #ef4444;
+            font-size: 12px;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 100px;
+            min-height: calc(100vh - 100px);
+            display: flex;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 40px 20px;
+            gap: 40px;
+        }
+
+        /* Filters Sidebar */
+        .filters-sidebar {
+            width: 300px;
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 30px;
+            height: fit-content;
+            position: sticky;
+            top: 120px;
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .filter-header h2 {
+            font-size: 24px;
+        }
+
+        .clear-filters {
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .clear-filters:hover {
+            text-decoration: underline;
+        }
+
+        .filter-section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .filter-section:last-child {
+            border-bottom: none;
+        }
+
+        .filter-section h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #ef4444;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .filter-option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .filter-option label {
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .filter-count {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .price-range {
+            margin-top: 15px;
+        }
+
+        .price-inputs {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .price-inputs input {
+            flex: 1;
+            padding: 8px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .range-slider {
+            margin-top: 20px;
+        }
+
+        .range-slider input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        /* Vehicle Grid */
+        .vehicles-section {
+            flex: 1;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .results-count {
+            font-size: 18px;
+        }
+
+        .sort-dropdown {
+            padding: 10px 20px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .vehicles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .vehicle-card {
+            background: #1a1a1a;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .vehicle-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(239, 68, 68, 0.2);
+        }
+
+        .vehicle-badges {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            backdrop-filter: blur(5px);
+        }
+
+        .badge-electric {
+            background: rgba(0, 102, 255, 0.9);
+            color: white;
+        }
+
+        .badge-hybrid {
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+        }
+
+        .badge-new {
+            background: rgba(255, 149, 0, 0.9);
+            color: white;
+        }
+
+        .badge-promo {
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+        }
+
+        .vehicle-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background: #222;
+        }
+
+        .vehicle-info {
+            padding: 20px;
+        }
+
+        .vehicle-brand {
+            font-size: 14px;
+            color: #ef4444;
+            margin-bottom: 5px;
+        }
+
+        .vehicle-model {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .vehicle-variant {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 20px;
+        }
+
+        .vehicle-specs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #999;
+        }
+
+        .spec-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .price-section {
+            background: #0a0a0a;
+            margin: -20px;
+            margin-top: 0;
+            padding: 20px;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .price-label {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .price-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ef4444;
+        }
+
+        .contract-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            padding-top: 15px;
+            border-top: 1px solid #222;
+        }
+
+        .view-details-btn {
+            width: 100%;
+            padding: 12px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .view-details-btn:hover {
+            background: #dc2626;
+        }
+
+        /* Vehicle Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: block;
+        }
+
+        .modal-content {
+            max-width: 1200px;
+            margin: 50px auto;
+            background: #1a1a1a;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .modal-image-section {
+            background: #0a0a0a;
+            border-radius: 20px 0 0 20px;
+            padding: 40px;
+        }
+
+        .modal-main-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-thumbnails {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+        }
+
+        .modal-thumb {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .modal-thumb:hover,
+        .modal-thumb.active {
+            opacity: 1;
+        }
+
+        .modal-info-section {
+            padding: 40px;
+        }
+
+        .modal-title {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .modal-subtitle {
+            font-size: 18px;
+            color: #999;
+            margin-bottom: 30px;
+        }
+
+        .modal-price-box {
+            background: #ef4444;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-price-label {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .modal-price {
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .modal-features {
+            margin-bottom: 30px;
+        }
+
+        .modal-features h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #ef4444;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .feature-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-name {
+            color: #999;
+        }
+
+        .feature-value {
+            font-weight: 600;
+        }
+
+        .modal-cta {
+            display: flex;
+            gap: 15px;
+        }
+
+        .modal-cta button {
+            flex: 1;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .btn-request {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-request:hover {
+            background: #dc2626;
+        }
+
+        .btn-contact {
+            background: transparent;
+            color: white;
+            border: 2px solid white !important;
+        }
+
+        .btn-contact:hover {
+            background: white;
+            color: black;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #999;
+        }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .no-results h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .no-results p {
+            color: #999;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .filters-sidebar {
+                width: 100%;
+                position: static;
+                margin-bottom: 30px;
+            }
+
+            .modal-body {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-image-section {
+                border-radius: 20px 20px 0 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .vehicles-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div>
+                    <span class="logo-icon">ity</span>
+                    <span class="logo-text">rent.it</span>
+                    <div class="logo-tagline">NOLEGGIO A LUNGO TERMINE</div>
+                </div>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Filters Sidebar -->
+        <aside class="filters-sidebar">
+            <div class="filter-header">
+                <h2>Filtri</h2>
+                <a href="#" class="clear-filters" onclick="clearAllFilters()">Cancella tutto</a>
+            </div>
+
+            <!-- Categoria -->
+            <div class="filter-section">
+                <h3>Categoria</h3>
+                <div class="filter-option">
+                    <input type="checkbox" id="cat-suv" onchange="applyFilters()">
+                    <label for="cat-suv">SUV</label>
+                    <span class="filter-count">(24)</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="cat-berlina" onchange="applyFilters()">
+                    <label for="cat-berlina">Berlina</label>
+                    <span class="filter-count">(18)</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="cat-city" onchange="applyFilters()">
+                    <label for="cat-city">City Car</label>
+                    <span class="filter-count">(15)</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="cat-station" onchange="applyFilters()">
+                    <label for="cat-station">Station Wagon</label>
+                    <span class="filter-count">(12)</span>
+                </div>
+            </div>
+
+            <!-- Alimentazione -->
+            <div class="filter-section">
+                <h3>Alimentazione</h3>
+                <div class="filter-option">
+                    <input type="checkbox" id="fuel-electric" onchange="applyFilters()">
+                    <label for="fuel-electric">Elettrica</label>
+                    <span class="filter-count">(16)</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="fuel-hybrid" onchange="applyFilters()">
+                    <label for="fuel-hybrid">Ibrida</label>
+                    <span class="filter-count">(22)</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="fuel-petrol" onchange="applyFilters()">
+                    <label for="fuel-petrol">Benzina</label>
+                    <span class="filter-count">(18)</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="fuel-diesel" onchange="applyFilters()">
+                    <label for="fuel-diesel">Diesel</label>
+                    <span class="filter-count">(14)</span>
+                </div>
+            </div>
+
+            <!-- Prezzo -->
+            <div class="filter-section">
+                <h3>Canone Mensile</h3>
+                <div class="price-range">
+                    <div class="price-inputs">
+                        <input type="number" id="price-min" placeholder="Min €" onchange="applyFilters()">
+                        <input type="number" id="price-max" placeholder="Max €" onchange="applyFilters()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marchio -->
+            <div class="filter-section">
+                <h3>Marchio</h3>
+                <div class="filter-option">
+                    <input type="checkbox" id="brand-jeep" onchange="applyFilters()">
+                    <label for="brand-jeep">Jeep</label>
+                    <span class="filter-count">(8)</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="brand-audi" onchange="applyFilters()">
+                    <label for="brand-audi">Audi</label>
+                    <span class="filter-count">(12)</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="brand-bmw" onchange="applyFilters()">
+                    <label for="brand-bmw">BMW</label>
+                    <span class="filter-count">(10)</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="brand-mercedes" onchange="applyFilters()">
+                    <label for="brand-mercedes">Mercedes</label>
+                    <span class="filter-count">(11)</span>
+                </div>
+                <div class="filter-option">
+                    <input type="checkbox" id="brand-volkswagen" onchange="applyFilters()">
+                    <label for="brand-volkswagen">Volkswagen</label>
+                    <span class="filter-count">(9)</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Vehicles Section -->
+        <section class="vehicles-section">
+            <div class="results-header">
+                <span class="results-count">Mostrando <span id="results-count">12</span> veicoli</span>
+                <select class="sort-dropdown" onchange="sortVehicles(this.value)">
+                    <option value="price-asc">Prezzo crescente</option>
+                    <option value="price-desc">Prezzo decrescente</option>
+                    <option value="name-asc">Nome A-Z</option>
+                    <option value="recent">Più recenti</option>
+                </select>
+            </div>
+
+            <div class="vehicles-grid" id="vehicles-grid">
+                <!-- I veicoli verranno inseriti qui dinamicamente -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal Dettagli Veicolo -->
+    <div class="modal" id="vehicle-modal">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeModal()">&times;</div>
+            <div class="modal-body">
+                <div class="modal-image-section">
+                    <img id="modal-main-image" src="" alt="" class="modal-main-image">
+                    <div class="modal-thumbnails" id="modal-thumbnails">
+                        <!-- Thumbnails verranno inserite qui -->
+                    </div>
+                </div>
+                <div class="modal-info-section">
+                    <h2 class="modal-title" id="modal-title"></h2>
+                    <p class="modal-subtitle" id="modal-subtitle"></p>
+                    
+                    <div class="modal-price-box">
+                        <div class="modal-price-label">CANONE MENSILE</div>
+                        <div class="modal-price" id="modal-price"></div>
+                        <div style="margin-top: 10px; font-size: 14px; opacity: 0.9;">IVA Esclusa</div>
+                    </div>
+
+                    <div class="modal-features">
+                        <h3>Caratteristiche</h3>
+                        <div class="feature-grid">
+                            <div class="feature-row">
+                                <span class="feature-name">Alimentazione</span>
+                                <span class="feature-value" id="modal-fuel"></span>
+                            </div>
+                            <div class="feature-row">
+                                <span class="feature-name">Potenza</span>
+                                <span class="feature-value" id="modal-power"></span>
+                            </div>
+                            <div class="feature-row">
+                                <span class="feature-name">Cambio</span>
+                                <span class="feature-value" id="modal-transmission"></span>
+                            </div>
+                            <div class="feature-row">
+                                <span class="feature-name">Posti</span>
+                                <span class="feature-value" id="modal-seats"></span>
+                            </div>
+                            <div class="feature-row">
+                                <span class="feature-name">Durata contratto</span>
+                                <span class="feature-value" id="modal-duration"></span>
+                            </div>
+                            <div class="feature-row">
+                                <span class="feature-name">Chilometri inclusi</span>
+                                <span class="feature-value" id="modal-km"></span>
+                            </div>
+                            <div class="feature-row">
+                                <span class="feature-name">Anticipo</span>
+                                <span class="feature-value" id="modal-deposit"></span>
+                            </div>
+                            <div class="feature-row">
+                                <span class="feature-name">Consegna</span>
+                                <span class="feature-value" id="modal-delivery"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-cta">
+                        <button class="btn-request" onclick="requestQuote()">Richiedi Preventivo</button>
+                        <button class="btn-contact" onclick="contactUs()">Contattaci</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Caricamento database veicoli esterno -->
+    <script src="vehicles-database.js"></script>
+    
+    <script>
+        // Variabili globali che verranno popolate dal file esterno
+        let vehicles = [];
+        let currentVehicles = [];
+        let selectedVehicle = null;
+
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            // Carica i veicoli dal database esterno
+            if (typeof vehiclesDatabase !== 'undefined') {
+                vehicles = vehiclesDatabase;
+                currentVehicles = [...vehicles];
+                renderVehicles(currentVehicles);
+                updateFilterCounts();
+            } else {
+                console.error('Database veicoli non trovato! Assicurati che vehicles-database.js sia caricato.');
+                document.getElementById('vehicles-grid').innerHTML = `
+                    <div class="no-results">
+                        <h3>Errore nel caricamento</h3>
+                        <p>Il database dei veicoli non è stato caricato correttamente.</p>
+                    </div>
+                `;
+            }
+        });
+
+        // Aggiorna i conteggi nei filtri
+        function updateFilterCounts() {
+            // Conta per categoria
+            const categoryCounts = {
+                'suv': vehicles.filter(v => v.category === 'suv' && v.available).length,
+                'berlina': vehicles.filter(v => v.category === 'berlina' && v.available).length,
+                'city': vehicles.filter(v => v.category === 'city' && v.available).length,
+                'station': vehicles.filter(v => v.category === 'station' && v.available).length
+            };
+            
+            // Conta per alimentazione
+            const fuelCounts = {
+                'electric': vehicles.filter(v => v.fuel === 'electric' && v.available).length,
+                'hybrid': vehicles.filter(v => v.fuel === 'hybrid' && v.available).length,
+                'petrol': vehicles.filter(v => v.fuel === 'petrol' && v.available).length,
+                'diesel': vehicles.filter(v => v.fuel === 'diesel' && v.available).length
+            };
+            
+            // Conta per marchio
+            const brandCounts = {
+                'jeep': vehicles.filter(v => v.brand.toLowerCase() === 'jeep' && v.available).length,
+                'audi': vehicles.filter(v => v.brand.toLowerCase() === 'audi' && v.available).length,
+                'bmw': vehicles.filter(v => v.brand.toLowerCase() === 'bmw' && v.available).length,
+                'mercedes': vehicles.filter(v => v.brand.toLowerCase() === 'mercedes' && v.available).length,
+                'volkswagen': vehicles.filter(v => v.brand.toLowerCase() === 'volkswagen' && v.available).length
+            };
+            
+            // Aggiorna i conteggi nel DOM
+            Object.keys(categoryCounts).forEach(cat => {
+                const element = document.querySelector(`#cat-${cat}`).parentElement.querySelector('.filter-count');
+                if (element) element.textContent = `(${categoryCounts[cat]})`;
+            });
+            
+            Object.keys(fuelCounts).forEach(fuel => {
+                const element = document.querySelector(`#fuel-${fuel}`).parentElement.querySelector('.filter-count');
+                if (element) element.textContent = `(${fuelCounts[fuel]})`;
+            });
+            
+            Object.keys(brandCounts).forEach(brand => {
+                const element = document.querySelector(`#brand-${brand}`).parentElement.querySelector('.filter-count');
+                if (element) element.textContent = `(${brandCounts[brand]})`;
+            });
+        }
+
+        // Funzione per renderizzare i veicoli
+        function renderVehicles(vehiclesToRender) {
+            const grid = document.getElementById('vehicles-grid');
+            const count = document.getElementById('results-count');
+            
+            if (vehiclesToRender.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-results">
+                        <h3>Nessun veicolo trovato</h3>
+                        <p>Prova a modificare i filtri di ricerca</p>
+                    </div>
+                `;
+                count.textContent = '0';
+                return;
+            }
+
+            count.textContent = vehiclesToRender.length;
+            
+            grid.innerHTML = vehiclesToRender.map(vehicle => `
+                <div class="vehicle-card" onclick="openModal(${vehicle.id})">
+                    <div class="vehicle-badges">
+                        ${vehicle.badges.map(badge => {
+                            const badgeClasses = {
+                                'electric': 'badge-electric',
+                                'hybrid': 'badge-hybrid',
+                                'new': 'badge-new',
+                                'promo': 'badge-promo'
+                            };
+                            const badgeLabels = {
+                                'electric': 'ELETTRICA',
+                                'hybrid': 'IBRIDA',
+                                'new': 'NUOVO',
+                                'promo': 'PROMO'
+                            };
+                            return `<span class="badge ${badgeClasses[badge]}">${badgeLabels[badge]}</span>`;
+                        }).join('')}
+                    </div>
+                    <img src="${vehicle.image}" alt="${vehicle.brand} ${vehicle.model}" class="vehicle-image">
+                    <div class="vehicle-info">
+                        <div class="vehicle-brand">${vehicle.brand.toUpperCase()}</div>
+                        <div class="vehicle-model">${vehicle.model}</div>
+                        <div class="vehicle-variant">${vehicle.variant}</div>
+                        
+                        <div class="vehicle-specs">
+                            <span class="spec-item">⚡ ${vehicle.power}</span>
+                            <span class="spec-item">⛽ ${getFuelLabel(vehicle.fuel)}</span>
+                            <span class="spec-item">⚙️ ${vehicle.transmission}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="price-section">
+                        <div class="price-row">
+                            <span class="price-label">CANONE MENSILE</span>
+                            <span class="price-value">€${vehicle.price}</span>
+                        </div>
+                        <div class="contract-info">
+                            <span>${vehicle.duration}</span>
+                            <span>${vehicle.km}</span>
+                            <span>Anticipo ${vehicle.deposit}</span>
+                        </div>
+                        <button class="view-details-btn" onclick="event.stopPropagation(); openModal(${vehicle.id})">
+                            Vedi Dettagli
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Helper per etichette carburante
+        function getFuelLabel(fuel) {
+            const labels = {
+                'electric': 'Elettrica',
+                'hybrid': 'Ibrida',
+                'petrol': 'Benzina',
+                'diesel': 'Diesel'
+            };
+            return labels[fuel] || fuel;
+        }
+
+        // Applica filtri
+        function applyFilters() {
+            let filtered = [...vehicles];
+
+            // Filtro categoria
+            const categories = ['suv', 'berlina', 'city', 'station'];
+            const selectedCategories = categories.filter(cat => 
+                document.getElementById(`cat-${cat}`)?.checked
+            );
+            if (selectedCategories.length > 0) {
+                filtered = filtered.filter(v => selectedCategories.includes(v.category));
+            }
+
+            // Filtro alimentazione
+            const fuels = ['electric', 'hybrid', 'petrol', 'diesel'];
+            const selectedFuels = fuels.filter(fuel => 
+                document.getElementById(`fuel-${fuel}`)?.checked
+            );
+            if (selectedFuels.length > 0) {
+                filtered = filtered.filter(v => selectedFuels.includes(v.fuel));
+            }
+
+            // Filtro prezzo
+            const minPrice = document.getElementById('price-min')?.value;
+            const maxPrice = document.getElementById('price-max')?.value;
+            if (minPrice) {
+                filtered = filtered.filter(v => v.price >= parseInt(minPrice));
+            }
+            if (maxPrice) {
+                filtered = filtered.filter(v => v.price <= parseInt(maxPrice));
+            }
+
+            // Filtro marchio
+            const brands = ['jeep', 'audi', 'bmw', 'mercedes', 'volkswagen'];
+            const selectedBrands = brands.filter(brand => 
+                document.getElementById(`brand-${brand}`)?.checked
+            );
+            if (selectedBrands.length > 0) {
+                filtered = filtered.filter(v => 
+                    selectedBrands.includes(v.brand.toLowerCase())
+                );
+            }
+
+            currentVehicles = filtered;
+            renderVehicles(currentVehicles);
+        }
+
+        // Pulisci tutti i filtri
+        function clearAllFilters() {
+            // Reset checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            // Reset price inputs
+            document.getElementById('price-min').value = '';
+            document.getElementById('price-max').value = '';
+            
+            currentVehicles = [...vehicles];
+            renderVehicles(currentVehicles);
+        }
+
+        // Ordina veicoli
+        function sortVehicles(sortBy) {
+            let sorted = [...currentVehicles];
+            
+            switch(sortBy) {
+                case 'price-asc':
+                    sorted.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-desc':
+                    sorted.sort((a, b) => b.price - a.price);
+                    break;
+                case 'name-asc':
+                    sorted.sort((a, b) => `${a.brand} ${a.model}`.localeCompare(`${b.brand} ${b.model}`));
+                    break;
+                case 'recent':
+                    sorted.sort((a, b) => b.id - a.id);
+                    break;
+            }
+            
+            currentVehicles = sorted;
+            renderVehicles(currentVehicles);
+        }
+
+        // Modal functions
+        function openModal(vehicleId) {
+            const vehicle = vehicles.find(v => v.id === vehicleId);
+            if (!vehicle) return;
+            
+            selectedVehicle = vehicle;
+            
+            // Popola modal
+            document.getElementById('modal-title').textContent = `${vehicle.brand} ${vehicle.model}`;
+            document.getElementById('modal-subtitle').textContent = vehicle.variant;
+            document.getElementById('modal-price').textContent = `€${vehicle.price}`;
+            document.getElementById('modal-fuel').textContent = getFuelLabel(vehicle.fuel);
+            document.getElementById('modal-power').textContent = vehicle.power;
+            document.getElementById('modal-transmission').textContent = vehicle.transmission;
+            document.getElementById('modal-seats').textContent = `${vehicle.seats} posti`;
+            document.getElementById('modal-duration').textContent = vehicle.duration;
+            document.getElementById('modal-km').textContent = vehicle.km;
+            document.getElementById('modal-deposit').textContent = vehicle.deposit;
+            document.getElementById('modal-delivery').textContent = vehicle.delivery;
+            
+            // Immagine principale
+            const mainImage = document.getElementById('modal-main-image');
+            mainImage.src = vehicle.image;
+            mainImage.alt = `${vehicle.brand} ${vehicle.model}`;
+            
+            // Thumbnails (simulazione con placeholders)
+            const thumbsContainer = document.getElementById('modal-thumbnails');
+            thumbsContainer.innerHTML = '';
+            for(let i = 0; i < 4; i++) {
+                const thumb = document.createElement('img');
+                thumb.src = vehicle.image;
+                thumb.alt = `View ${i + 1}`;
+                thumb.className = 'modal-thumb' + (i === 0 ? ' active' : '');
+                thumb.onclick = () => {
+                    mainImage.src = vehicle.image;
+                    document.querySelectorAll('.modal-thumb').forEach(t => t.classList.remove('active'));
+                    thumb.classList.add('active');
+                };
+                thumbsContainer.appendChild(thumb);
+            }
+            
+            // Mostra modal
+            document.getElementById('vehicle-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('vehicle-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            selectedVehicle = null;
+        }
+
+        // Chiudi modal con ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Chiudi modal cliccando fuori
+        document.getElementById('vehicle-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Funzioni CTA
+        function requestQuote() {
+            if (!selectedVehicle) return;
+            // Qui puoi implementare la logica per richiedere un preventivo
+            alert(`Richiesta preventivo per ${selectedVehicle.brand} ${selectedVehicle.model}\n\nVerrai ricontattato a breve!`);
+            closeModal();
+        }
+
+        function contactUs() {
+            // Qui puoi implementare la logica per contattare
+            window.location.href = 'tel:+390123456789';
+        }
+
+        // Funzione per aggiornare facilmente il database veicoli
+        function updateVehicleDatabase(newVehicles) {
+            vehicles.length = 0;
+            vehicles.push(...newVehicles);
+            currentVehicles = [...vehicles];
+            renderVehicles(currentVehicles);
+        }
+
+        // Funzione per aggiungere un nuovo veicolo
+        function addVehicle(vehicle) {
+            vehicle.id = vehicles.length + 1;
+            vehicles.push(vehicle);
+            currentVehicles = [...vehicles];
+            renderVehicles(currentVehicles);
+        }
+
+        // Funzione per rimuovere un veicolo
+        function removeVehicle(vehicleId) {
+            const index = vehicles.findIndex(v => v.id === vehicleId);
+            if (index > -1) {
+                vehicles.splice(index, 1);
+                currentVehicles = [...vehicles];
+                renderVehicles(currentVehicles);
+            }
+        }
+
+        // Funzione per marcare un veicolo come non disponibile
+        function setVehicleAvailability(vehicleId, available) {
+            const vehicle = vehicles.find(v => v.id === vehicleId);
+            if (vehicle) {
+                vehicle.available = available;
+                currentVehicles = [...vehicles].filter(v => v.available);
+                renderVehicles(currentVehicles);
+            }
+        }
+
+        // Esempio di come aggiungere un nuovo veicolo
+        // addVehicle({
+        //     brand: 'Tesla',
+        //     model: 'Model 3',
+        //     variant: 'Long Range AWD',
+        //     category: 'berlina',
+        //     fuel: 'electric',
+        //     price: 699,
+        //     power: '440cv',
+        //     transmission: 'Automatico',
+        //     seats: 5,
+        //     duration: '36 mesi',
+        //     km: '45.000 km',
+        //     deposit: '€0',
+        //     delivery: '8-10 settimane',
+        //     image: 'https://via.placeholder.com/400x300/333/fff?text=Tesla+Model+3',
+        //     badges: ['electric', 'new'],
+        //     available: true
+        // });
+    </script>
+</body>
+  </html>
